@@ -1,9 +1,16 @@
 #LCSS
 import pandas as pd
 from ast import literal_eval
-
+import time
 from math import radians, cos, sin, asin, sqrt
+import numpy as np
 
+def cmp(x,y):
+	if x[0] > y[0]:
+            return -1
+        elif x[0] == y[0]:
+            return 0
+	return 1
 def haversine(x,y):
     """
     Calculate the great circle distance between two points
@@ -66,15 +73,20 @@ trajectory_list.pop(0)
 trajectory_list = [literal_eval(x) for x in trajectory_list]
 
 print trainSet["journeyPatternId"][1]
+start_time = time.time()
 
-
-for route in trajectory_list:
+for route in trajectory_list:	
+	cm=[]
 	for line,jpid in zip(trainSet["Trajectory"],trainSet["journeyPatternId"]):
-		#traj = line["Trajectory"]
-		#print line
 		C = lcss(route,line)
-	#	print C[len(route)-1][len(line)-1]
-		print backtrack(C,route,line,len(route)-1,len(line)-1),jpid
+
+		cm.append([C[len(route)-1][len(line)-1],backtrack(C,route,line,len(route)-1,len(line)-1),jpid])
+        cm.sort(cmp=cmp)
+	for i in range(0,5):
+	    print cm[i]	
+        print "###########################################################################"
 
 
+total_time = time.time()-start_time#  time.time()
+print "total_time:",total_time
 
