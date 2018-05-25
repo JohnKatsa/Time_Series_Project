@@ -5,8 +5,11 @@ import csv
 from dtw import dtw
 
 import time
+from operator import itemgetter
 
 from math import radians, cos, sin, asin, sqrt
+
+from gmplot import gmplot
 
 def haversine(x,y):
     """
@@ -55,14 +58,11 @@ for x in trajectory_list0[4]:
 
 trajectory_list = []
 journey_list = []
-trainSet = pd.read_csv('./train_set.csv',converters={"Trajectory": literal_eval},index_col='tripId')
-trainSet = trainSet[0:20]
+trainSet = pd.read_csv('./train_set.csv',converters={"Trajectory": literal_eval},index_col='tripId',nrows=20)
+#trainSet = trainSet[0:20]
 for x, jpid in zip(trainSet["Trajectory"],trainSet["journeyPatternId"]):
     trajectory_list.append(x)
     journey_list.append(jpid)
-
-print trajectory_list[0][0]
-
 
 # get for pair 1 the dtw distances and store them in closest
 closest1 = []
@@ -74,45 +74,100 @@ index = 0
 for trip,journey in zip(trajectory_list,journey_list):
     lonlattest = []
     for x in trip:
-        lonlattest.append([x[1],x[2]])
+        lonlattest.append((x[1],x[2]))
     dist1, cost1, acc1, path1 = dtw(lonlat1,lonlattest,dist=haversine)
-    closest1.append(dist1)
+    closest1.append([dist1,lonlattest,journey])
     dist2, cost2, acc2, path2 = dtw(lonlat2,lonlattest,dist=haversine)
-    closest2.append(dist2)
+    closest2.append([dist2,lonlattest,journey])
     dist3, cost3, acc3, path3 = dtw(lonlat3,lonlattest,dist=haversine)
-    closest3.append(dist3)
+    closest3.append([dist3,lonlattest,journey])
     dist4, cost4, acc4, path4 = dtw(lonlat4,lonlattest,dist=haversine)
-    closest4.append(dist4)
+    closest4.append([dist4,lonlattest,journey])
     dist5, cost5, acc5, path5 = dtw(lonlat5,lonlattest,dist=haversine)
-    closest5.append(dist5)
+    closest5.append([dist5,lonlattest,journey])
     index+=1
 
 #print closest
-array1 = np.asarray(closest1)
-minfive1 = array1.argsort(axis=0)[:5]
-for i in minfive1:
-    print "1", journey_list[i], closest1[i]
+closest1.sort(key=itemgetter(0))
+closest1 = closest1[0:5]
+gmap = gmplot.GoogleMapPlotter(lonlat1[0][1],lonlat1[0][0], 13)
+lons, lats = zip(*lonlat1)
+gmap.plot(lats, lons, 'cornflowerblue', edge_width=5)
+# Draw
+gmap.draw("trip1.html")
+filenames = ["trip11.html","trip12.html","trip13.html","trip14.html","trip15.html"]
+for i in range(0,5):
+    gmap = gmplot.GoogleMapPlotter(closest1[i][1][0][1],closest1[i][1][0][0], 13)
+    temp = closest1[i][1]
+    lons, lats = zip(*temp)
+    gmap.plot(lats, lons, 'cornflowerblue', edge_width=5)
+    # Draw
+    gmap.draw(filenames[i])
 
-array2 = np.asarray(closest2)
-minfive2 = array2.argsort(axis=0)[:5]
-for i in minfive2:
-    print "2", journey_list[i], closest2[i]
+closest2.sort(key=itemgetter(0))
+closest2 = closest2[0:5]
+gmap = gmplot.GoogleMapPlotter(lonlat2[0][1],lonlat2[0][0], 13)
+lons, lats = zip(*lonlat2)
+gmap.plot(lats, lons, 'cornflowerblue', edge_width=5)
+# Draw
+gmap.draw("trip2.html")
+filenames = ["trip21.html","trip22.html","trip23.html","trip24.html","trip25.html"]
+for i in range(0,5):
+    gmap = gmplot.GoogleMapPlotter(closest2[i][1][0][1],closest2[i][1][0][0], 13)
+    temp = closest2[i][1]
+    lons, lats = zip(*temp)
+    gmap.plot(lats, lons, 'cornflowerblue', edge_width=5)
+    # Draw
+    gmap.draw(filenames[i])
 
-array3 = np.asarray(closest3)
-minfive3 = array3.argsort(axis=0)[:5]
-for i in minfive3:
-    print "3", journey_list[i], closest3[i]
+closest3.sort(key=itemgetter(0))
+closest3 = closest3[0:5]
+gmap = gmplot.GoogleMapPlotter(lonlat3[0][1],lonlat3[0][0], 13)
+lons, lats = zip(*lonlat3)
+gmap.plot(lats, lons, 'cornflowerblue', edge_width=5)
+# Draw
+gmap.draw("trip3.html")
+filenames = ["trip31.html","trip32.html","trip33.html","trip34.html","trip35.html"]
+for i in range(0,5):
+    gmap = gmplot.GoogleMapPlotter(closest3[i][1][0][1],closest3[i][1][0][0], 13)
+    temp = closest3[i][1]
+    lons, lats = zip(*temp)
+    gmap.plot(lats, lons, 'cornflowerblue', edge_width=5)
+    # Draw
+    gmap.draw(filenames[i])
 
-array4 = np.asarray(closest4)
-minfive4 = array4.argsort(axis=0)[:5]
-for i in minfive4:
-    print "4", journey_list[i], closest4[i]
+closest4.sort(key=itemgetter(0))
+closest4 = closest4[0:5]
+gmap = gmplot.GoogleMapPlotter(lonlat4[0][1],lonlat4[0][0], 13)
+lons, lats = zip(*lonlat4)
+gmap.plot(lats, lons, 'cornflowerblue', edge_width=5)
+# Draw
+gmap.draw("trip4.html")
+filenames = ["trip41.html","trip42.html","trip43.html","trip44.html","trip45.html"]
+for i in range(0,5):
+    gmap = gmplot.GoogleMapPlotter(closest4[i][1][0][1],closest4[i][1][0][0], 13)
+    temp = closest4[i][1]
+    lons, lats = zip(*temp)
+    gmap.plot(lats, lons, 'cornflowerblue', edge_width=5)
+    # Draw
+    gmap.draw(filenames[i])
 
-array5 = np.asarray(closest5)
-minfive5 = array5.argsort(axis=0)[:5]
-for i in minfive5:
-    print "5", journey_list[i], closest5[i]
+closest5.sort(key=itemgetter(0))
+closest5 = closest5[0:5]
+gmap = gmplot.GoogleMapPlotter(lonlat5[0][1],lonlat5[0][0], 13)
+lons, lats = zip(*lonlat5)
+gmap.plot(lats, lons, 'cornflowerblue', edge_width=5)
+# Draw
+gmap.draw("trip5.html")
+filenames = ["trip51.html","trip52.html","trip53.html","trip54.html","trip55.html"]
+for i in range(0,5):
+    gmap = gmplot.GoogleMapPlotter(closest5[i][1][0][1],closest5[i][1][0][0], 13)
+    temp = closest5[i][1]
+    lons, lats = zip(*temp)
+    gmap.plot(lats, lons, 'cornflowerblue', edge_width=5)
+    # Draw
+    gmap.draw(filenames[i])
 
 #calculate elapsed time
 elapsed_time = time.time() - start_time
-print "dt = ", elapsed_time, "sec" 
+print "dt = ", elapsed_time, "sec"
