@@ -11,6 +11,27 @@ from math import radians, cos, sin, asin, sqrt
 
 from gmplot import gmplot
 
+def knn(closest):
+
+    d = {}
+
+    for x in closest:
+        d[str(x[2])] = 0
+        print x[2]
+
+    for x in closest:
+        d[str(x[2])] += 1
+
+    max = d[str(closest[0][2])]
+    maxjpid = closest[0][2]
+    for key, value in d.iteritems():
+        if value > max:
+            max = value
+            maxjpid = key
+
+    print maxjpid
+    return maxjpid
+
 def haversine(x,y):
     """
     Calculate the great circle distance between two points
@@ -58,7 +79,7 @@ for x in trajectory_list0[4]:
 
 trajectory_list = []
 journey_list = []
-trainSet = pd.read_csv('./train_set.csv',converters={"Trajectory": literal_eval},index_col='tripId',nrows=20)
+trainSet = pd.read_csv('./train_set.csv',converters={"Trajectory": literal_eval},index_col='tripId',nrows=200)
 #trainSet = trainSet[0:20]
 for x, jpid in zip(trainSet["Trajectory"],trainSet["journeyPatternId"]):
     trajectory_list.append(x)
@@ -167,6 +188,9 @@ for i in range(0,5):
     gmap.plot(lats, lons, 'cornflowerblue', edge_width=5)
     # Draw
     gmap.draw(filenames[i])
+
+# knn call
+knn(closest2)
 
 #calculate elapsed time
 elapsed_time = time.time() - start_time
