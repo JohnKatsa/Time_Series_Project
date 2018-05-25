@@ -4,6 +4,7 @@ from ast import literal_eval
 import time
 from math import radians, cos, sin, asin, sqrt
 import numpy as np
+import gmplot
 
 def cmp(x,y):
 	if x[0] > y[0]:
@@ -63,8 +64,8 @@ def backtrack(C,X,Y,i,j):
 
 
 
-trainSet = pd.read_csv('./train_set.csv',converters={"Trajectory": literal_eval},index_col='tripId')
-trainSet = trainSet[0:250]
+trainSet = pd.read_csv('./train_set.csv',converters={"Trajectory": literal_eval},index_col='tripId',nrows=1500)
+trainSet = trainSet[0:500]
 trajectory_list = []
 with open('./test_set_a2.csv','rb') as csvfile:
     for row in csvfile:
@@ -75,18 +76,48 @@ trajectory_list = [literal_eval(x) for x in trajectory_list]
 print trainSet["journeyPatternId"][1]
 start_time = time.time()
 
+
+filenames = ["my_map1.html","my_map2.html","my_map4.html","my_map5.html","my_map6.html"]
+fi=0
 for route in trajectory_list:	
+	latlong = []
+	for j in route:
+		latlong.append((j[2],j[1]))
+	gmap = gmplot.GoogleMapPlotter(latlong[0][0], latlong[0][1], 13)
+	lats, lons = zip(*latlong)
+	gmap.plot(lats, lons, 'cornflowerblue', edge_width=5)
+	gmap.draw("original.html")
+
 	cm=[]
 	for line,jpid in zip(trainSet["Trajectory"],trainSet["journeyPatternId"]):
 		C = lcss(route,line)
-
-		cm.append([C[len(route)-1][len(line)-1],backtrack(C,route,line,len(route)-1,len(line)-1),jpid])
-        cm.sort(cmp=cmp)
+	#	print C[len(route)-1][len(line)-1]
+		cm.append([C[len(route)-1][len(line)-1],backtrack(C,route,line,len(route)-1,len(line)-1),jpid,route])
+	cm.sort(cmp=cmp)
+	latlong = []
+	latsl = []
+	fi=0
 	for i in range(0,5):
-	    print cm[i]	
-        print "###########################################################################"
+	   #print cm[i][2:]
+		latlong = []
+		latsl = []
+		for j in cm[i][3]:
+	   		latlong.append((j[2],j[1]))
+	   	for jj in cm[i][1]:
+	   		latsl.append((jj[2],jj[1]))
 
-
+	   	gmap = gmplot.GoogleMapPlotter(latlong[i][0], latlong[i][1], 13)
+	   	lats, lons = zip(*latlong)
+		gmap.plot(lats, lons, 'cornflowerblue', edge_width=5)
+	   	
+	   	if len(cm[i][1]) > 0:
+	   		#gmap = gmplot.GoogleMapPlotter(latsl[0][0], latsl[0][1], 19)
+	   		lats2, lons2 = zip(*latsl)
+	   		gmap.plot(lats2,lons2,'red',edge_width=6)
+    	gmap.draw(filenames[fi])
+    	fi += 1;
+    	if fi >= 5:
+    		break
 total_time = time.time()-start_time#  time.time()
 print "total_time:",total_time
 
