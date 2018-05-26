@@ -79,7 +79,7 @@ for x in trajectory_list0[4]:
 
 trajectory_list = []
 journey_list = []
-trainSet = pd.read_csv('./train_set.csv',converters={"Trajectory": literal_eval},index_col='tripId',nrows=200)
+trainSet = pd.read_csv('./train_set.csv',converters={"Trajectory": literal_eval},index_col='tripId')
 #trainSet = trainSet[0:20]
 for x, jpid in zip(trainSet["Trajectory"],trainSet["journeyPatternId"]):
     trajectory_list.append(x)
@@ -111,6 +111,10 @@ for trip,journey in zip(trajectory_list,journey_list):
 #print closest
 closest1.sort(key=itemgetter(0))
 closest1 = closest1[0:5]
+
+for i in range(0,5):
+    print "dtw = ", closest1[i][0], " km,", " jpid = ", closest1[i][2]
+
 gmap = gmplot.GoogleMapPlotter(lonlat1[0][1],lonlat1[0][0], 13)
 lons, lats = zip(*lonlat1)
 gmap.plot(lats, lons, 'cornflowerblue', edge_width=5)
@@ -127,6 +131,10 @@ for i in range(0,5):
 
 closest2.sort(key=itemgetter(0))
 closest2 = closest2[0:5]
+
+for i in range(0,5):
+    print "dtw = ", closest2[i][0], " km,", " jpid = ", closest2[i][2]
+
 gmap = gmplot.GoogleMapPlotter(lonlat2[0][1],lonlat2[0][0], 13)
 lons, lats = zip(*lonlat2)
 gmap.plot(lats, lons, 'cornflowerblue', edge_width=5)
@@ -143,6 +151,10 @@ for i in range(0,5):
 
 closest3.sort(key=itemgetter(0))
 closest3 = closest3[0:5]
+
+for i in range(0,5):
+    print "dtw = ", closest3[i][0], " km,", " jpid = ", closest3[i][2]
+
 gmap = gmplot.GoogleMapPlotter(lonlat3[0][1],lonlat3[0][0], 13)
 lons, lats = zip(*lonlat3)
 gmap.plot(lats, lons, 'cornflowerblue', edge_width=5)
@@ -159,6 +171,10 @@ for i in range(0,5):
 
 closest4.sort(key=itemgetter(0))
 closest4 = closest4[0:5]
+
+for i in range(0,5):
+    print "dtw = ", closest4[i][0], " km,", " jpid = ", closest4[i][2]
+
 gmap = gmplot.GoogleMapPlotter(lonlat4[0][1],lonlat4[0][0], 13)
 lons, lats = zip(*lonlat4)
 gmap.plot(lats, lons, 'cornflowerblue', edge_width=5)
@@ -175,6 +191,10 @@ for i in range(0,5):
 
 closest5.sort(key=itemgetter(0))
 closest5 = closest5[0:5]
+
+for i in range(0,5):
+    print "dtw = ", closest5[i][0], " km,", " jpid = ", closest5[i][2]
+
 gmap = gmplot.GoogleMapPlotter(lonlat5[0][1],lonlat5[0][0], 13)
 lons, lats = zip(*lonlat5)
 gmap.plot(lats, lons, 'cornflowerblue', edge_width=5)
@@ -190,7 +210,7 @@ for i in range(0,5):
     gmap.draw(filenames[i])
 
 # knn call
-knn(closest2)
+#knn(closest2)
 
 #calculate elapsed time
 elapsed_time = time.time() - start_time
