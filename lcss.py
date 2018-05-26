@@ -64,8 +64,8 @@ def backtrack(C,X,Y,i,j):
 
 
 
-trainSet = pd.read_csv('./train_set.csv',converters={"Trajectory": literal_eval},index_col='tripId',nrows=1500)
-trainSet = trainSet[0:1200]
+trainSet = pd.read_csv('./train_set.csv',converters={"Trajectory": literal_eval},index_col='tripId')
+#trainSet = trainSet[0:1200]
 trajectory_list = []
 with open('./test_set_a2.csv','rb') as csvfile:
 	for row in csvfile:
@@ -93,8 +93,8 @@ for route in trajectory_list:
 	cm=[]
 	for line,jpid in zip(trainSet["Trajectory"],trainSet["journeyPatternId"]):
 		C = lcss(route,line)
-		print C[len(route)-1][len(line)-1]
-		cm.append([C[len(route)-1][len(line)-1],backtrack(C,route,line,len(route)-1,len(line)-1),jpid,route])
+	#	print C[len(route)-1][len(line)-1]
+		cm.append([C[len(route)-1][len(line)-1],backtrack(C,route,line,len(route)-1,len(line)-1),jpid,line])
 	cm.sort(cmp=cmp)
 	latlong = []
 	latsl = []
@@ -116,13 +116,15 @@ for route in trajectory_list:
 		if len(cm[i][1]) > 0:
 			#gmap = gmplot.GoogleMapPlotter(latsl[0][0], latsl[0][1], 19)
 			lats2, lons2 = zip(*latsl)
-			gmap.plot(lats2,lons2,'red',edge_width=6)
+			gmap.plot(lats2,lons2,'red',edge_width=3)
 		gmap.draw(file)
 		fi += 1
+		print "jpid=%s,%d koina simeia" %(cm[i][2],cm[i][0])
 		#print fi,i
 		if fi >= 5:
 			break
 	counter+=1
 	total_time = time.time()-start_time#  time.time()
-print "total_time:",total_time
+	start_time = time.time()
+	print "total_time for %s:%s\n====================\n\n" %(counter,total_time)
 
