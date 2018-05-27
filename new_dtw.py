@@ -7,7 +7,8 @@ from dtw import dtw
 import time
 from operator import itemgetter
 
-from math import radians, cos, sin, asin, sqrt
+from math import radians, cos, sin, asin, sqrt, ceil
+import random
 
 from gmplot import gmplot
 
@@ -29,7 +30,7 @@ def knn(closest):
             max = value
             maxjpid = key
 
-    print maxjpid
+    #print maxjpid
     return maxjpid
 
 def haversine(x,y):
@@ -48,9 +49,52 @@ def haversine(x,y):
     r = 6371 # Radius of earth in kilometers. Use 3956 for miles
     return c * r
 
+def cross_validation(data,k):
+
+    print data
+    limit = int(ceil(len(data)*0.7))
+    print limit
+
+    success = 0
+    success_rate = 0
+
+    # repeat k times
+    for i in range(k):
+        random.shuffle(data) # shuffle data
+        train_data = data[:limit]   # take training set 70%
+        test_data = data[limit:]    # take rest for testing
+
+        realjpid = []
+        predictedjpid = []
+        closest = []
+
+        for test,i in zip(test_data,range(len(test_data))):
+            for train,j in zip(train_data,range(len(train_data))):
+                dist, cost, acc, path = dtw(zip(*test_data)[1][i],zip(*train_data)[1][j],dist=haversine)
+                closest.append([dist,zip(*train_data)[1][i],zip(*train_data)[0][i]])
+
+            # keep real journeyPatternId
+            realjpid.append(zip(*test_data)[0][i])
+
+            # sort and take min 5
+            closest.sort(key=itemgetter(0))
+            closest = closest[0:5]
+
+            predictedjpid.append(knn(closest))
+
+        for i in range(len(realjpid)):
+            if realjpid[i] == predictedjpid[i]:
+                success += 1
+            #print "real = ", realjpid, " predicted = ", predictedjpid
+        success_rate += float(success/len(realjpid))
+        #print success_rate
+
+    success_rate = success_rate/k
+    print "total success rate = ", success_rate
+
 # initialize time
 start_time = time.time()
-trainSet = pd.read_csv('./train_set.csv',converters={"Trajectory": literal_eval},index_col='tripId',nrows=200)
+trainSet = pd.read_csv('./train_set.csv',converters={"Trajectory": literal_eval},index_col='tripId',nrows=50)
 
 
 # read test set and make lon-lat lists
@@ -61,6 +105,10 @@ with open('./test_set_a1.csv','rb') as csvfile:
 trajectory_list0.pop(0)
 trajectory_list0 = [literal_eval(x) for x in trajectory_list0]
 index = 0
+
+# used for cross validation
+crval = []
+flag = 0;
 
 for route in trajectory_list0:
     lonlat=[]
@@ -78,8 +126,14 @@ for route in trajectory_list0:
         lonlattest = []
         for x in trip:
             lonlattest.append((x[1],x[2]))
+
+        # used for cross validation
+        if flag != -1:
+            crval.append([journey,lonlattest])
+
         dist1, cost1, acc1, path1 = dtw(lonlat,lonlattest,dist=haversine)
         closest.append([dist1,lonlattest,journey])
+    flag = -1   # stop making cross validation data
     closest.sort(key=itemgetter(0))
     closest = closest[0:5]
     gmap = gmplot.GoogleMapPlotter(lonlat[0][1],lonlat[0][0], 13)
@@ -100,3 +154,5 @@ for route in trajectory_list0:
     total_time = time.time()-start_time#  time.time()
     start_time = time.time()
     print "total_time : %s\n====================\n\n" %(total_time)
+
+cross_validation(crval,10)
