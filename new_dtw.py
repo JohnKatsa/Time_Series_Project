@@ -18,7 +18,7 @@ def knn(closest):
 
     for x in closest:
         d[str(x[2])] = 0
-        print x[2]
+        #print x[2]
 
     for x in closest:
         d[str(x[2])] += 1
@@ -65,6 +65,9 @@ def cross_validation(data,k):
         test_data = data[limit:]    # take rest for testing
 
         realjpid = []
+        # keep real journeyPatternId
+        realjpid.append(zip(*test_data)[0][i])
+
         predictedjpid = []
         closest = []
 
@@ -72,9 +75,6 @@ def cross_validation(data,k):
             for train,j in zip(train_data,range(len(train_data))):
                 dist, cost, acc, path = dtw(zip(*test_data)[1][i],zip(*train_data)[1][j],dist=haversine)
                 closest.append([dist,zip(*train_data)[1][i],zip(*train_data)[0][i]])
-
-            # keep real journeyPatternId
-            realjpid.append(zip(*test_data)[0][i])
 
             # sort and take min 5
             closest.sort(key=itemgetter(0))
@@ -94,7 +94,7 @@ def cross_validation(data,k):
 
 # initialize time
 start_time = time.time()
-trainSet = pd.read_csv('./train_set.csv',converters={"Trajectory": literal_eval},index_col='tripId',nrows=50)
+trainSet = pd.read_csv('./train_set.csv',converters={"Trajectory": literal_eval},index_col='tripId',nrows=700)
 
 
 # read test set and make lon-lat lists
