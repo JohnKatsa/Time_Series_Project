@@ -18,7 +18,8 @@ def knn(closest):
 
     for x in closest:
         d[str(x[2])] = 0
-        #print x[2]
+        print x[2]
+    print "---------------------------"
 
     for x in closest:
         d[str(x[2])] += 1
@@ -51,30 +52,28 @@ def haversine(x,y):
 
 def cross_validation(data,k):
 
-    print data
+    #print data
     limit = int(ceil(len(data)*0.7))
-    print limit
+    #print limit
 
-    success = 0
     success_rate = 0
 
     # repeat k times
-    for i in range(k):
+    for o in range(k):
+        success = 0
         random.shuffle(data) # shuffle data
         train_data = data[:limit]   # take training set 70%
         test_data = data[limit:]    # take rest for testing
 
-        realjpid = []
-        # keep real journeyPatternId
-        realjpid.append(zip(*test_data)[0][i])
-
+        #realjpid = []
+        realjpid = zip(*test_data)[0]
         predictedjpid = []
         closest = []
 
         for test,i in zip(test_data,range(len(test_data))):
             for train,j in zip(train_data,range(len(train_data))):
                 dist, cost, acc, path = dtw(zip(*test_data)[1][i],zip(*train_data)[1][j],dist=haversine)
-                closest.append([dist,zip(*train_data)[1][i],zip(*train_data)[0][i]])
+                closest.append([dist,zip(*train_data)[1][j],zip(*train_data)[0][j]])
 
             # sort and take min 5
             closest.sort(key=itemgetter(0))
@@ -82,17 +81,18 @@ def cross_validation(data,k):
 
             predictedjpid.append(knn(closest))
 
-        for i in range(len(realjpid)):
-            if realjpid[i] == predictedjpid[i]:
+        for l in range(len(realjpid)):
+            if realjpid[l] == predictedjpid[l]:
                 success += 1
-            #print "real = ", realjpid, " predicted = ", predictedjpid
-        success_rate += float(success/len(realjpid))
+            print "real = ", realjpid[l], " predicted = ", predictedjpid[l]
+        success_rate += float(success)/float(len(realjpid))
         #print success_rate
 
-        print k, " fold ended"
+        print o, " fold ended"
 
     success_rate = success_rate/k
     print "total success rate = ", success_rate
+    
 
 # initialize time
 start_time = time.time()
@@ -161,4 +161,4 @@ for route in trajectory_list0:
     start_time = time.time()
     print "total_time : %s\n====================\n\n" %(total_time)
 
-cross_validation(crval,10)
+cross_validation(crval,1)
