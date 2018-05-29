@@ -50,7 +50,7 @@ def haversine(x,y):
 
 # initialize time
 start_time = time.time()
-trainSet = pd.read_csv('./train_set.csv',converters={"Trajectory": literal_eval},index_col='tripId',nrows=200)
+trainSet = pd.read_csv('./train_set.csv',converters={"Trajectory": literal_eval},index_col='tripId',nrows=1200)
 
 
 # read test set and make lon-lat lists
